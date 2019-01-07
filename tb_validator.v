@@ -45,7 +45,7 @@ module TB;
   // student ID
   reg[0:11] tprtn = 12'b0;
 
-  SEQ_DETECTOR dut(
+  seq_23735 dut(
     out, 
     seq, 
     clk,
