@@ -4,6 +4,7 @@ import fileinput
 import subprocess
 import pandas as pd
 import time
+import re
 '''''
 command = 'iverilog dff.v seq_23003.v seq_tb.v'
 os.system(command)
@@ -15,7 +16,7 @@ def change_module (str, dir):
     f = open(dir,'r')
     filedata = f.read()
     f.close()
-    newdata = filedata.replace('module seq_'+str+'(output out, input seq, input clk, input clear);','module SEQ_DETECTOR(output out, input seq, input clk, input clear);')
+    newdata = re.sub(r"^module seq_23[0-9]{3}\s?\(\s?output out\s?,\s?input seq\s?,\s?input clk\s?,\s?input clear\s?\);",'module SEQ_DETECTOR(output out, input seq, input clk, input clear);',filedata)
     f = open(dir,'w')
     f.write(newdata)
     f.close()
@@ -45,8 +46,17 @@ def CHECK_SUBMISSION(BN):
 def passorfail(strBN,intBCD):
     result = []
     result.append(int(strBN))
-    CHECK_SUBMISSION(strBN)
-    result.append(CHECK_SUBMISSION(strBN))
+    grade = CHECK_SUBMISSION(strBN)
+    result.append(grade)
+    if grade ==[(True, 'PASS'), (True, 'PASS'), (True, 'PASS')]:
+            result.append(4)
+    elif grade[1] == (True, 'PASS') :
+            result.append(3)
+    elif (grade[0] == (True, 'PASS') ) or (grade[2] == (True, 'PASS') ):
+            result.append(1)
+    else:
+                    result.append(1)
+
     print(result)
     return result
 #########################################
@@ -57,16 +67,21 @@ data = []
 subfolders = os.listdir(dir) 
 for i in subfolders:
     #change_module(i,dir+"\\"+i+"\\"+"seq_"+i+".v") #needed to be ran once
+
     result = passorfail(i,BNtoBCD(i))
     data.append(result)
 right=0
+notworking = 0 
 for i in range (0,len(data)):
-    if [(True, 'PASS'), (True, 'PASS'), (True, 'PASS')] in data[i]:
-        right= right +1
+        if [(True, 'PASS'), (True, 'PASS'), (True, 'PASS')] in data[i]:
+                right= right +1
+        if (False, 'C:\\Users\\yousefmaw\\Desktop\\ass4>vvp a.out ') in data[i]:
+                notworking= notworking +1
 print("number of right submissions is",right)
 print("number of wrong submissions is",len(data)-right)
+print("number of not workin submissions is",notworking)
 name =  'result' + str(time.time())+ '.xlsx'
-df = pd.DataFrame(data,columns=['BN','pass or fail']) 
+df = pd.DataFrame(data,columns=['BN','pass or fail','grade']) 
 excel = pd.ExcelWriter(name)
 df.to_excel(excel,'Sheet1')
 excel.save()
