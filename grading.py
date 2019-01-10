@@ -5,6 +5,7 @@ import subprocess
 import pandas as pd
 import time
 import re
+import shutil
 '''''
 command = 'iverilog dff.v seq_23003.v seq_tb.v'
 os.system(command)
@@ -77,17 +78,23 @@ for i in subfolders:
 
     result = passorfail(i,BNtoBCD(i))
     data.append(result)
+    if result [2]==-1:
+            shutil.copytree(dir+"\\"+i, "wrong\\"+i, symlinks=False, ignore=None)
 right=0
-
+wrong =0
 for i in range (0,len(data)):
-        if [(True, 'PASS'), (True, 'PASS'), (True, 'PASS')] in data[i]:
+        if data[i][2] == 4:
                 right= right +1
+        if data[i][2] == -1:
+                wrong = wrong +1
         
-print("number of right submissions is",right)
-print("number of wrong submissions is",len(data)-right)
 
+print("number of right submissions is",right)
+print("number of wrong submissions is",wrong)
+print ("number of semi wrong submissions is",len(data)-right -wrong)
 name =  'result' + str(time.time())+ '.xlsx'
 df = pd.DataFrame(data,columns=['BN','pass or fail','grade']) 
 excel = pd.ExcelWriter(name)
 df.to_excel(excel,'Sheet1')
 excel.save()
+
