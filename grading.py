@@ -47,8 +47,9 @@ def CHECK_SUBMISSION(BN):
         stderr=subprocess.STDOUT)
     out.wait()
     stdout,stderr = out.communicate()
+    print(stdout)
     res = (stdout.decode("utf-8").split("\r\n")[-4:-1])
-    return [(i=="PASS", i) for i in res]
+    return [(i) for i in res]
 
 #### main function for grading
 
@@ -58,9 +59,9 @@ def passorfail(strBN,intBCD):
     change_tb(strBN) 
     grade = CHECK_SUBMISSION(strBN)
     result.append(grade)
-    if grade ==[(True, 'PASS'), (True, 'PASS'), (True, 'PASS')]:
+    if grade ==[('PASS'), ('PASS'), ('PASS')]:
             result.append(4)
-    elif grade[1] == (True, 'PASS') :
+    elif grade[1] == ('PASS') :
             result.append(3)
     else:
             result.append(-1)
@@ -77,9 +78,11 @@ for i in subfolders:
     #change_module(i,dir+"\\"+i+"\\"+"seq_"+i+".v") #needed to be ran once
 
     result = passorfail(i,BNtoBCD(i))
+    
     data.append(result)
     if result [2]==-1:
             shutil.copytree(dir+"\\"+i, "wrong\\"+i, symlinks=False, ignore=None)
+            
 right=0
 wrong =0
 for i in range (0,len(data)):

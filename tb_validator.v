@@ -75,9 +75,9 @@ module TB;
     end
     
     @(negedge clk) begin
-      if ((is_correct && out===1) || (!is_correct && out===0)) $display("PASS"); //testing for right out after 12 cycles
-      else if (is_correct && out===0) $display("FAIL: expected out==1 @correct sequence"); 
-      else if (!is_correct && out===1) $display("FAIL: expected out==0 @wrong sequence");
+      if ((is_correct===1'b1 & out===1'b1) || (is_correct===1'b0 & out===1'b0)) $display("PASS"); //testing for right out after 12 cycles
+      else if (is_correct===1'b1 & out!==1'b1) $display("FAIL: expected out==1 @correct sequence"); 
+      else if (is_correct===1'b0 & out!==1'b0) $display("FAIL: expected out==0 @wrong sequence");
     end
     end
   endtask
@@ -85,7 +85,7 @@ module TB;
 
   initial begin
     //$dumpfile("dump.vcd"); $dumpvars;
-    $display("Testing: %d", `SEQ_BCD_NUM);
+    //$display("Testing: %d", `SEQ_BCD_NUM);
     bus_driver (`SEQ_BCD_NUM<<1,  0, 1);
     bus_driver (`SEQ_BCD_NUM,     1, 0);
     bus_driver (`SEQ_BCD_NUM>>1,  0, 0);
